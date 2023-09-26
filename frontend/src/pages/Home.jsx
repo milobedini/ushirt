@@ -24,7 +24,7 @@ const Home = () => {
             <motion.div {...headTextAnimation}>
               <h1 className="head-text">
                 by
-                <br className="xl:block hidden" /> NOSTALGIA NIGHTS.
+                <br /> NOSTALGIA NIGHTS.
               </h1>
             </motion.div>
             <motion.div
