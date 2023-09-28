@@ -1,6 +1,7 @@
 import CustomButton from './CustomButton';
 
 const FilePicker = ({ file, setFile, readFile }) => {
+  console.log('FilePicker', file);
   return (
     <div className="filepicker-container">
       <div className="flex-1 flex flex-col">
@@ -14,7 +15,7 @@ const FilePicker = ({ file, setFile, readFile }) => {
           Upload File
         </label>
         <p className="mt-2 text-gray-500 text-xs truncate">
-          {file === '' ? 'No file uploaded' : file.name}
+          {file === '' ? 'No file uploaded' : file.name && file.name}
         </p>
       </div>
       <div className="mt-4 flex flex-wrap gap-3">

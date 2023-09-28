@@ -1,3 +1,5 @@
+import { Cloudinary } from '@cloudinary/url-gen';
+import { backgroundRemoval } from '@cloudinary/url-gen/actions/effect';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import { useSnapshot } from 'valtio';
@@ -24,6 +26,10 @@ const Customiser = () => {
     logoShirt: true,
     stylishShirt: false,
   });
+  const [normalImg, setNormalImg] = useState('');
+  const [image, setImage] = useState(null);
+  const [url, setUrl] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // Show tab content depending on active tab.
   const generateTabContent = () => {
@@ -47,6 +53,33 @@ const Customiser = () => {
     }
   };
 
+  const uploadToCloudinary = async (img) => {
+    console.log('Uploading to Cloudinary');
+    setImage(file);
+    const data = new FormData();
+    data.append('file', img);
+    data.append('upload_preset', 'ilrqnidr');
+    data.append('cloud_name', 'dvgbdioec');
+    data.append('folder', 'UShirt');
+
+    try {
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/dvgbdioec/image/upload`,
+        {
+          method: 'POST',
+          body: data,
+        },
+      );
+      const res = await response.json();
+      setUrl(res.public_id);
+
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+      console.log(err);
+    }
+  };
+
   const handleSubmit = async (type) => {
     if (!prompt) return alert('Please enter a prompt.');
     try {
@@ -65,7 +98,7 @@ const Customiser = () => {
 
       const data = await response.json();
 
-      handleDecals(type, `data:image/png;base64,${data.image}`);
+      handleDecals(type, `data:image/png;base64,${data.image}`, url);
     } catch (error) {
       alert(error.message);
     } finally {
@@ -74,7 +107,25 @@ const Customiser = () => {
     }
   };
 
-  const handleDecals = (type, result) => {
+  const handleDecals = (type, result, url) => {
+    // RemoveBG logic
+    console.log('Removing BG using url', url);
+
+    const cld = new Cloudinary({
+      cloud: {
+        cloudName: 'dvgbdioec',
+      },
+    });
+    let myImage = cld
+      .image(url)
+      .effect(backgroundRemoval())
+      .format('png')
+      .toURL();
+
+    console.log('New URL', myImage);
+
+    setNormalImg(myImage);
+
     const decalType = DecalTypes[type];
     state[decalType.stateProperty] = result;
 
@@ -107,9 +158,12 @@ const Customiser = () => {
     });
   };
 
-  const readFile = (type) => {
+  const readFile = async (type) => {
+    // Upload image to Cloudinary
+    'READ FILE', url;
+    await uploadToCloudinary(file);
     reader(file).then((result) => {
-      handleDecals(type, result);
+      handleDecals(type, result, url);
       setActiveEditorTab('');
     });
   };
@@ -162,6 +216,11 @@ const Customiser = () => {
                 handleClick={() => handleActiveFilterTab(tab.name)}
               />
             ))}
+            <img
+              src={`https://res.cloudinary.com/dvgbdioec/image/upload/v1695927122/${url}`}
+              alt=""
+              className="border-2 border-white w-20 h-20"
+            />
           </motion.div>
         </>
       )}
