@@ -1,4 +1,4 @@
-import 'abortcontroller-polyfill/dist/polyfill-patch-fetch'
+import 'abortcontroller-polyfill/dist/polyfill-patch-fetch.js'
 import { config } from 'dotenv'
 import express from 'express'
 import cors from 'cors'
