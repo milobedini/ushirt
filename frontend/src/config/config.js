@@ -1,9 +1,11 @@
 const config = {
   development: {
-    backendUrl: "http://localhost:8080/api/v1/dalle",
+    backendUrl: 'https://ushirt-server.onrender.com/api/v1/dalle',
+    // backendUrl: 'localhost:8080',
   },
   production: {
-    backendUrl: "https://devswag.onrender.com/api/v1/dalle",
+    backendUrl: 'https://ushirt-server.onrender.com/api/v1/dalle',
+    // backendUrl: 'localhost:8080',
   },
 };
 

@@ -24,6 +24,8 @@ router.route('/').post(async (req, res) => {
       response_format: 'b64_json',
     })
 
+    console.log(prompt, response)
+
     const image = response.data[0].b64_json
 
     res.status(200).json({
@@ -34,6 +36,7 @@ router.route('/').post(async (req, res) => {
     console.error(err)
     res.status(500).json({
       message: 'Something went wrong.',
+      error: err,
     })
   }
 })
