@@ -15,6 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "abortcontroller-polyfill": "^1.7.5",
     "cloudinary": "^1.41.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
