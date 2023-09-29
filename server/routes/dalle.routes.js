@@ -40,11 +40,13 @@ router.route('/').post(async (req, res) => {
     const base64Image = `data:${blob.type};base64,${base64Data}`
 
     // imageStream.pipe(
-    cloudinary.v2.uploader.upload(
+    cloudinary.v2.uploader.unsigned_upload(
       base64Image,
+      'ilrqnidr',
       {
         resource_type: 'image',
       },
+
       (error, result) => {
         if (error) {
           console.log(error)
