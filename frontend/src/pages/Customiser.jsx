@@ -1,5 +1,3 @@
-import { Cloudinary } from '@cloudinary/url-gen';
-import { backgroundRemoval } from '@cloudinary/url-gen/actions/effect';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import { useSnapshot } from 'valtio';
@@ -26,10 +24,6 @@ const Customiser = () => {
     logoShirt: true,
     stylishShirt: false,
   });
-  const [normalImg, setNormalImg] = useState('');
-  const [image, setImage] = useState(null);
-  const [url, setUrl] = useState('');
-  const [loading, setLoading] = useState(false);
 
   // Show tab content depending on active tab.
   const generateTabContent = () => {
@@ -53,52 +47,46 @@ const Customiser = () => {
     }
   };
 
-  const uploadToCloudinary = async (img) => {
-    console.log('Uploading to Cloudinary');
-    setImage(file);
-    const data = new FormData();
-    data.append('file', img);
-    data.append('upload_preset', 'ilrqnidr');
-    data.append('cloud_name', 'dvgbdioec');
-    data.append('folder', 'UShirt');
-
-    try {
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/dvgbdioec/image/upload`,
-        {
-          method: 'POST',
-          body: data,
-        },
-      );
-      const res = await response.json();
-      setUrl(res.public_id);
-
-      setLoading(false);
-    } catch (err) {
-      setLoading(false);
-      console.log(err);
-    }
-  };
-
   const handleSubmit = async (type) => {
     if (!prompt) return alert('Please enter a prompt.');
     try {
       setGeneratingImg(true);
-      const response = await fetch(
-        'https://ushirt-server.onrender.com/api/v1/dalle',
-        // 'http://localhost:8080/api/v1/dalle'
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ prompt }),
-        },
+      // const response = await fetch(
+      //   'https://ushirt-server.onrender.com/api/v1/dalle/create-image',
+      //   {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     },
+      //     body: JSON.stringify({ prompt }),
+      //   },
+      // );
+
+      // const data = await response.json();
+      // console.log(data.originalImg);
+
+      // const res = await fetch(
+      //   'https://ushirt-server.onrender.com/api/v1/dalle/upload-cloudinary',
+      //   {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     },
+      //     body: JSON.stringify({ url: data.originalImg }),
+      //   },
+      // );
+
+      // const data2 = await res.json();
+      // console.log(data2.imageNoBg);
+
+      // // Send second request to get Cloudinary version
+
+      const image64 = await imageUrlToBase64(
+        'https://res.cloudinary.com/dvgbdioec/image/upload/v1696019977/svydk2z3vxjiwucnv96n.png',
+        // data2.imageNoBg,
       );
 
-      const data = await response.json();
-
-      handleDecals(type, `data:image/png;base64,${data.image}`, url);
+      handleDecals(type, image64);
     } catch (error) {
       alert(error.message);
     } finally {
@@ -107,26 +95,28 @@ const Customiser = () => {
     }
   };
 
-  const handleDecals = (type, result, url) => {
-    // RemoveBG logic
-    console.log('Removing BG using url', url);
+  const imageUrlToBase64 = async (url) => {
+    console.log('Cloudinary image url: ', url);
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          resolve(reader.result); // reader.result contains the base64 string
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Failed to convert image URL to base64', error);
+      throw error;
+    }
+  };
 
-    const cld = new Cloudinary({
-      cloud: {
-        cloudName: 'dvgbdioec',
-      },
-    });
-    let myImage = cld
-      .image(url)
-      .effect(backgroundRemoval())
-      .format('png')
-      .toURL();
-
-    console.log('New URL', myImage);
-
-    setNormalImg(myImage);
-
+  const handleDecals = (type, result) => {
     const decalType = DecalTypes[type];
+    console.log('Setting state', decalType.stateProperty, result);
     state[decalType.stateProperty] = result;
 
     if (!activeFilterTab[decalType.filterTab]) {
@@ -158,12 +148,9 @@ const Customiser = () => {
     });
   };
 
-  const readFile = async (type) => {
-    // Upload image to Cloudinary
-    'READ FILE', url;
-    await uploadToCloudinary(file);
+  const readFile = (type) => {
     reader(file).then((result) => {
-      handleDecals(type, result, url);
+      handleDecals(type, result);
       setActiveEditorTab('');
     });
   };
@@ -216,12 +203,6 @@ const Customiser = () => {
                 handleClick={() => handleActiveFilterTab(tab.name)}
               />
             ))}
-            <img
-              // src={`https://res.cloudinary.com/dvgbdioec/image/upload/v1695927122/${url}`}
-              src="https://res.cloudinary.com/dvgbdioec/image/upload/v1695996932/clz2mojmt4rwwy9t0zti.png"
-              alt=""
-              className="border-2 border-white w-20 h-20"
-            />
           </motion.div>
         </>
       )}
