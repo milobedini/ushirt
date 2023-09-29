@@ -47,6 +47,7 @@ router.route('/').post(async (req, res) => {
       },
       (error, result) => {
         if (error) {
+          console.log(error)
           console.error('Error uploading to Cloudinary:', error)
           res.status(500).json({
             message: 'Failed to upload to Cloudinary.',
@@ -61,8 +62,8 @@ router.route('/').post(async (req, res) => {
         }
       }
     )
-    // )
   } catch (err) {
+    console.log(err)
     console.error(err)
     res.status(500).json({
       message: 'Something went wrong.',
