@@ -22,7 +22,7 @@ router.route('/').get((req, res) => {
   })
 })
 
-router.route('/').post(async (req, res) => {
+router.route('/create-image').post(async (req, res) => {
   try {
     const { prompt } = req.body
     const response = await openai.images.generate({
@@ -33,23 +33,52 @@ router.route('/').post(async (req, res) => {
     })
 
     const image = response.data[0].url
+    res.status(200).json({
+      message: 'Image created successfully.',
+      originalImg: image,
+    })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({
+      message: 'Error creating image.',
+      error: err,
+    })
+  }
+})
 
-    const blob = await removeBackground(image)
+router.route('/remove-background').post(async (req, res) => {
+  try {
+    const { imageUrl } = req.body
+    const blob = await removeBackground(imageUrl)
     const blobData = await blob.arrayBuffer()
     const base64Data = Buffer.from(blobData).toString('base64')
     const base64Image = `data:${blob.type};base64,${base64Data}`
 
-    // imageStream.pipe(
+    res.status(200).json({
+      message: 'Background removed successfully.',
+      base64Image: base64Image,
+    })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({
+      message: 'Error removing background.',
+      error: err,
+    })
+  }
+})
+
+router.route('/upload-cloudinary').post((req, res) => {
+  try {
+    const { base64Image } = req.body
+
     cloudinary.v2.uploader.unsigned_upload(
       base64Image,
       'ilrqnidr',
       {
         resource_type: 'image',
       },
-
       (error, result) => {
         if (error) {
-          console.log(error)
           console.error('Error uploading to Cloudinary:', error)
           res.status(500).json({
             message: 'Failed to upload to Cloudinary.',
@@ -59,16 +88,14 @@ router.route('/').post(async (req, res) => {
           res.status(200).json({
             message: 'Image uploaded successfully to Cloudinary.',
             imageNoBg: result.url,
-            originalImg: image,
           })
         }
       }
     )
   } catch (err) {
-    console.log(err)
     console.error(err)
     res.status(500).json({
-      message: 'Something went wrong.',
+      message: 'Error uploading image.',
       error: err,
     })
   }
