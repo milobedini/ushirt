@@ -69,14 +69,16 @@ router.route('/remove-background').post(async (req, res) => {
 
 router.route('/upload-cloudinary').post((req, res) => {
   try {
-    const { base64Image } = req.body
+    const { url } = req.body
 
-    cloudinary.v2.uploader.unsigned_upload(
-      base64Image,
-      'ilrqnidr',
+    cloudinary.v2.uploader.upload(
+      url,
+      // 'ilrqnidr',
       {
         resource_type: 'image',
+        background_removal: 'cloudinary_ai',
       },
+
       (error, result) => {
         if (error) {
           console.error('Error uploading to Cloudinary:', error)
