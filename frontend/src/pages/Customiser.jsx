@@ -217,7 +217,8 @@ const Customiser = () => {
               />
             ))}
             <img
-              src={`https://res.cloudinary.com/dvgbdioec/image/upload/v1695927122/${url}`}
+              // src={`https://res.cloudinary.com/dvgbdioec/image/upload/v1695927122/${url}`}
+              src="https://res.cloudinary.com/dvgbdioec/image/upload/v1695996932/clz2mojmt4rwwy9t0zti.png"
               alt=""
               className="border-2 border-white w-20 h-20"
             />
