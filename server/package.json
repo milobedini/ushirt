@@ -17,6 +17,7 @@
   "dependencies": {
     "@imgly/background-removal": "^1.1.1",
     "@imgly/background-removal-node": "^1.1.1",
+    "axios": "^1.5.1",
     "cloudinary": "^1.41.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

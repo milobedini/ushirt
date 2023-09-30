@@ -2,6 +2,8 @@ import { config } from 'dotenv'
 import express from 'express'
 import OpenAi from 'openai'
 import cloudinary from 'cloudinary'
+import axios from 'axios'
+import FormData from 'form-data'
 
 config()
 
@@ -21,6 +23,9 @@ router.route('/').get((req, res) => {
   })
 })
 
+// https://removal.ai/my-account/
+// https://docs.picsart.io/reference/post_removebg  50 free per month
+
 router.route('/').post(async (req, res) => {
   try {
     const { prompt } = req.body
@@ -31,32 +36,29 @@ router.route('/').post(async (req, res) => {
       response_format: 'url',
     })
 
-    const image = response.data[0].url
+    // Use RemoveBG API
+    const formData = new FormData()
+    formData.append('size', 'auto')
+    console.log(response.data)
+    formData.append('image_url', response.data[0].url)
 
-    cloudinary.v2.uploader.upload(
-      image,
-      {
-        resource_type: 'image',
-        background_removal: 'cloudinary_ai',
+    const response2 = await axios({
+      method: 'post',
+      url: 'https://api.remove.bg/v1.0/removebg',
+      data: formData,
+      responseType: 'blob',
+      headers: {
+        ...formData.getHeaders(),
+        'X-Api-Key': process.env.REMOVE_BG_API,
       },
-
-      (error, result) => {
-        if (error) {
-          console.log(error)
-          console.error('Error uploading to Cloudinary:', error)
-          res.status(500).json({
-            message: 'Failed to upload to Cloudinary.',
-            error,
-          })
-        } else {
-          res.status(200).json({
-            message: 'Image uploaded successfully to Cloudinary.',
-            imageNoBg: result.url,
-            originalImg: image,
-          })
-        }
-      }
-    )
+      encoding: null,
+    })
+    console.log(response2.data)
+    res.status(200).json({
+      message: 'Success',
+      original: response.data[0].url,
+      noBg: response2.data,
+    })
   } catch (err) {
     console.log(err)
     console.error(err)
