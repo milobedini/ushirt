@@ -51,42 +51,24 @@ const Customiser = () => {
     if (!prompt) return alert('Please enter a prompt.');
     try {
       setGeneratingImg(true);
-      // const response = await fetch(
-      //   'https://ushirt-server.onrender.com/api/v1/dalle/create-image',
-      //   {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //     },
-      //     body: JSON.stringify({ prompt }),
-      //   },
-      // );
-
-      // const data = await response.json();
-      // console.log(data.originalImg);
-
-      // const res = await fetch(
-      //   'https://ushirt-server.onrender.com/api/v1/dalle/upload-cloudinary',
-      //   {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //     },
-      //     body: JSON.stringify({ url: data.originalImg }),
-      //   },
-      // );
-
-      // const data2 = await res.json();
-      // console.log(data2.imageNoBg);
-
-      // // Send second request to get Cloudinary version
-
-      const image64 = await imageUrlToBase64(
-        'https://res.cloudinary.com/dvgbdioec/image/upload/v1696019977/svydk2z3vxjiwucnv96n.png',
-        // data2.imageNoBg,
+      const response = await fetch(
+        'https://ushirt-server.onrender.com/api/v1/dalle/',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ prompt }),
+        },
       );
 
-      handleDecals(type, image64);
+      const data = await response.json();
+
+      const byteArray = new Uint8Array(data.noBg.data);
+      const imageBlob = new Blob([byteArray], { type: 'image/png' });
+      const imageSrc = URL.createObjectURL(imageBlob);
+
+      handleDecals(type, imageSrc);
     } catch (error) {
       alert(error.message);
     } finally {
@@ -95,28 +77,8 @@ const Customiser = () => {
     }
   };
 
-  const imageUrlToBase64 = async (url) => {
-    console.log('Cloudinary image url: ', url);
-    try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          resolve(reader.result); // reader.result contains the base64 string
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    } catch (error) {
-      console.error('Failed to convert image URL to base64', error);
-      throw error;
-    }
-  };
-
   const handleDecals = (type, result) => {
     const decalType = DecalTypes[type];
-    console.log('Setting state', decalType.stateProperty, result);
     state[decalType.stateProperty] = result;
 
     if (!activeFilterTab[decalType.filterTab]) {

@@ -39,7 +39,6 @@ router.route('/').post(async (req, res) => {
     // Use RemoveBG API
     const formData = new FormData()
     formData.append('size', 'auto')
-    console.log(response.data)
     formData.append('image_url', response.data[0].url)
 
     const response2 = await axios({
@@ -53,14 +52,12 @@ router.route('/').post(async (req, res) => {
       },
       encoding: null,
     })
-    console.log(response2.data)
     res.status(200).json({
       message: 'Success',
       original: response.data[0].url,
       noBg: response2.data,
     })
   } catch (err) {
-    console.log(err)
     console.error(err)
     res.status(500).json({
       message: 'Something went wrong.',
