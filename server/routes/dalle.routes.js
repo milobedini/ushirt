@@ -46,7 +46,7 @@ router.route('/').post(async (req, res) => {
       method: 'post',
       url: 'https://api.remove.bg/v1.0/removebg',
       data: formData,
-      responseType: 'blob',
+      responseType: 'arraybuffer',
       headers: {
         ...formData.getHeaders(),
         'X-Api-Key': process.env.REMOVE_BG_API,
