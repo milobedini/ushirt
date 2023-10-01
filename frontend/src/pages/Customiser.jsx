@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import { useSnapshot } from 'valtio';
+import { download } from '../assets';
 import {
   AIPicker,
   ColourPicker,
@@ -9,7 +10,7 @@ import {
   Tab,
 } from '../components';
 import { DecalTypes, EditorTabs, FilterTabs } from '../config/constants';
-import { reader } from '../config/helpers';
+import { downloadCanvasToImage, downloadLogo, reader } from '../config/helpers';
 import { fadeAnimation, slideAnimation } from '../config/motion';
 import state from '../store';
 
@@ -156,6 +157,24 @@ const Customiser = () => {
             className="filtertabs-container"
             {...slideAnimation('up')}
           >
+            <div className="absolute z-10 bottom-0 right-5 cursor-pointer">
+              <p className="text-center text-sm text-gray-300">Canvas</p>
+              <img
+                src={download}
+                onClick={downloadCanvasToImage}
+                width={66}
+                className=""
+              />
+            </div>
+            <div className="absolute z-10 bottom-0 right-20 cursor-pointer">
+              <p className="text-center text-sm text-gray-300">Logo</p>
+              <img
+                src={download}
+                onClick={() => downloadLogo(state.logoDecal)}
+                width={66}
+                className=""
+              />
+            </div>
             {FilterTabs.map((tab) => (
               <Tab
                 key={tab.name}

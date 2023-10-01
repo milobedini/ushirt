@@ -5,8 +5,7 @@ const state = proxy({
   color: '#EFBD48',
   isLogoTexture: true,
   isFullTexture: false,
-  logoDecal:
-    'http://res.cloudinary.com/dvgbdioec/image/upload/v1696069909/ytz7zhct8crbccwyplxv.png',
+  logoDecal: './nn.png',
   fullDecal: './nn.png',
 });
 
