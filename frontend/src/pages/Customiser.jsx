@@ -162,7 +162,7 @@ const Customiser = () => {
               <img
                 src={download}
                 onClick={downloadCanvasToImage}
-                width={66}
+                width={44}
                 className=""
               />
             </div>
@@ -171,7 +171,7 @@ const Customiser = () => {
               <img
                 src={download}
                 onClick={() => downloadLogo(state.logoDecal)}
-                width={66}
+                width={44}
                 className=""
               />
             </div>
