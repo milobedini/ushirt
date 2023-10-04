@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import { useSnapshot } from 'valtio';
+import { SERVER_URL } from '../../env';
 import { download } from '../assets';
 import {
   AIPicker,
@@ -52,16 +53,13 @@ const Customiser = () => {
     if (!prompt) return alert('Please enter a prompt.');
     try {
       setGeneratingImg(true);
-      const response = await fetch(
-        'https://ushirt-server.onrender.com/api/v1/dalle/',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ prompt }),
+      const response = await fetch(`${SERVER_URL}api/v1/dalle/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
+        body: JSON.stringify({ prompt }),
+      });
 
       const data = await response.json();
 
